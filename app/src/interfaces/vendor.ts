@@ -27,5 +27,9 @@ export interface Location {
 }
 
 export interface VendorsResponse {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
   data: Vendor[];
 }

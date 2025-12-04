@@ -7,7 +7,7 @@ export const themeColors = {
   background: "#FFFFFF",
   card: "#FAFAFA",
   border: "#E0E0E0",
-  accent: "#FF9800",
+  accent: "#304C89",
   accentDark: "#F57C00",
   star: "#F5AB00",
   error: "#D32F2F",

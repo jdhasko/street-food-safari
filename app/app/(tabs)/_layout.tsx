@@ -1,7 +1,7 @@
+import { useThemeColors } from "@/src/hooks/useThemeColors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router";
 import React from "react";
-import { useThemeColors } from "../../hooks/useThemeColors";
 
 const tabIcons = {
   vendors: {

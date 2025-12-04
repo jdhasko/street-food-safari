@@ -1,22 +1,24 @@
 import VendorCard from "@/src/components/VendorCard";
 import useVendors from "@/src/hooks/useVendors";
 import { router } from "expo-router";
-import {
-  ActivityIndicator,
-  FlatList,
-  Text,
-  View,
-  TouchableOpacity,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
 
 export default function VendorsScreen() {
-  const { vendors, isLoading, error, reload } = useVendors();
+  const {
+    vendors,
+    isLoading,
+    error,
+    reload,
+    loadMore,
+    isLoadingMore,
+    loadMoreError,
+  } = useVendors();
 
   if (isLoading && vendors.length === 0) {
     return (
-      <View className="flex-1 justify-center items-center">
+      <View className="flex-1 items-center justify-center my-4">
         <ActivityIndicator />
+        <Text>Loading vendors...</Text>
       </View>
     );
   }
@@ -36,10 +38,22 @@ export default function VendorsScreen() {
       keyExtractor={(item) => item.id}
       contentContainerStyle={{ paddingHorizontal: 8, paddingVertical: 4 }}
       renderItem={({ item }) => <VendorCard vendor={item} />}
+      onEndReached={loadMore}
+      onEndReachedThreshold={0.5}
       ListHeaderComponent={
-        <Text className="pb-2 pt-4 px-1 text-xl font-semibold">
+        <Text className="pb-2 pt-4 px-1 text-2xl font-semibold">
           All vendors
         </Text>
+      }
+      ListFooterComponent={
+        <>
+          {loadMoreError && (
+            <Text className="text-error mb-2">{loadMoreError}</Text>
+          )}
+          {isLoadingMore ? (
+            <ActivityIndicator style={{ marginVertical: 16 }} />
+          ) : null}
+        </>
       }
     />
   );

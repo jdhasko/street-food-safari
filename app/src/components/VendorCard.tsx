@@ -1,9 +1,9 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
-import React from "react";
-import { router } from "expo-router";
-import { Vendor } from "../interfaces/vendor";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { router } from "expo-router";
+import React from "react";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { useThemeColors } from "../hooks/useThemeColors";
+import { Vendor } from "../interfaces/vendor";
 
 interface VendorCardProps {
   vendor: Vendor;
@@ -15,7 +15,7 @@ const VendorCard = ({ vendor }: VendorCardProps) => {
   return (
     <TouchableOpacity
       className="mb-4"
-      onPress={() => router.push(`/vendors/${vendor.id}`)}
+      onPress={() => router.push(`../vendors/${vendor.id}`)}
     >
       <View className="bg-white rounded-xl shadow-lg">
         <View className="relative">
