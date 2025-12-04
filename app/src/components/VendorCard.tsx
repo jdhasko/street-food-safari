@@ -14,10 +14,10 @@ const VendorCard = ({ vendor }: VendorCardProps) => {
 
   return (
     <TouchableOpacity
-      className="mb-4"
+      className="mb-3"
       onPress={() => router.push(`../vendors/${vendor.id}`)}
     >
-      <View className="bg-white rounded-xl shadow-lg">
+      <View className="bg-white rounded-xl shadow-sm">
         <View className="relative">
           <Image
             source={{ uri: vendor.thumbnail }}

@@ -9,9 +9,15 @@ export const themeColors = {
   border: "#E0E0E0",
   accent: "#304C89",
   accentDark: "#F57C00",
-  star: "#F5AB00",
+
   error: "#D32F2F",
   success: "#388E3C",
+
+  spicyBackground: "#FEE4D6",
+  spicyIcon: "#C93A0E",
+  vegetarianBackground: "#E6F4EA",
+  vegetarianIcon: "#1B7A43",
+  star: "#F5AB00",
 };
 
 export type Colors = typeof themeColors;

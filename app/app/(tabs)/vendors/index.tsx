@@ -1,6 +1,5 @@
 import VendorCard from "@/src/components/VendorCard";
 import useVendors from "@/src/hooks/useVendors";
-import { router } from "expo-router";
 import {
   ActivityIndicator,
   FlatList,
@@ -8,8 +7,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function VendorsScreen() {
+  const insets = useSafeAreaInsets();
   const {
     vendors,
     isLoading,
@@ -47,7 +48,11 @@ export default function VendorsScreen() {
     <FlatList
       data={vendors}
       keyExtractor={(item) => item.id}
-      contentContainerStyle={{ paddingHorizontal: 8, paddingVertical: 4 }}
+      contentContainerStyle={{
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        paddingTop: Math.max(insets.top, 8),
+      }}
       renderItem={({ item }) => <VendorCard vendor={item} />}
       refreshing={isRefreshing}
       onRefresh={refresh}

@@ -3,7 +3,13 @@ import React from "react";
 
 const VendorLayout = () => {
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerTitle: "",
+        headerTransparent: true,
+        headerShadowVisible: false,
+      }}
+    >
       <Stack.Screen name="index" />
       <Stack.Screen name="[id]" />
     </Stack>

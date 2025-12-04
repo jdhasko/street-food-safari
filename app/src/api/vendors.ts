@@ -1,4 +1,4 @@
-import type { VendorsResponse } from "../interfaces/vendor";
+import type { Vendor, VendorsResponse } from "../interfaces/vendor";
 
 // In a real project, I would place it in an environment variable.
 // For this assignment, I kept it inline for simplicity.
@@ -18,4 +18,16 @@ export async function getVendors(
   const jsonData: VendorsResponse = await res.json();
 
   return jsonData;
+}
+
+export async function getVendorById(id: string) {
+  const url = `${API_BASE_URL}/vendors/${id}`;
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch vendors: ${res.status}`);
+  }
+
+  const data: Vendor = (await res.json()) as Vendor;
+  return data;
 }
