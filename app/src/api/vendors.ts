@@ -31,3 +31,20 @@ export async function getVendorById(id: string) {
   const data: Vendor = (await res.json()) as Vendor;
   return data;
 }
+
+export async function toggleVendorFavorite(id: string): Promise<Vendor> {
+  const url = `${API_BASE_URL}/vendors/${id}/favorite`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to toggle favorite: ${res.status}`);
+  }
+
+  const data: Vendor = await res.json();
+  return data;
+}

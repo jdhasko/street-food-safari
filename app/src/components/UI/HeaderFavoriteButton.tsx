@@ -13,11 +13,12 @@ const HeaderFavoriteButton = ({
   iconColor,
   onPress,
 }: HeaderFavoriteButtonProps) => {
-  const handlePress =
-    onPress ||
-    (() => {
-      // TODO: Implement favorite toggle functionality
-    });
+  const handlePress = () => {
+    onPress?.();
+  };
+
+  // Use red color when favorited, otherwise use the provided iconColor
+  const heartColor = isFavorite ? "#D32F2F" : iconColor;
 
   return (
     <View className="w-11 h-11 justify-center items-center">
@@ -29,7 +30,7 @@ const HeaderFavoriteButton = ({
         <Ionicons
           name={isFavorite ? "heart" : "heart-outline"}
           size={24}
-          color={iconColor}
+          color={heartColor}
         />
       </TouchableOpacity>
     </View>

@@ -1,6 +1,6 @@
-import HeaderFavoriteButton from "@/src/components/UI/HeaderFavoriteButton";
 import MapPreviewer from "@/src/components/MapPreviewer";
 import MenuItem from "@/src/components/MenuItem";
+import HeaderFavoriteButton from "@/src/components/UI/HeaderFavoriteButton";
 import { useThemeColors } from "@/src/hooks/useThemeColors";
 import useVendorDetails from "@/src/hooks/useVendorDetails";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -22,8 +22,16 @@ const VendorDetails = () => {
   const { id } = useLocalSearchParams();
   const colors = useThemeColors();
   const navigation = useNavigation();
-  const { vendor, isLoading, isRefreshing, error, reload, refresh } =
-    useVendorDetails(id as string);
+  const {
+    vendor,
+    isLoading,
+    isRefreshing,
+    error,
+    favoriteError,
+    reload,
+    refresh,
+    toggleFavorite,
+  } = useVendorDetails(id as string);
 
   useLayoutEffect(() => {
     if (!vendor) return;
@@ -33,6 +41,7 @@ const VendorDetails = () => {
         <HeaderFavoriteButton
           isFavorite={vendor.isFavorite}
           iconColor={colors.text.primary}
+          onPress={toggleFavorite}
         />
       ),
       //To make the header more accessible on Android I had to add a background color to the header.
@@ -41,7 +50,7 @@ const VendorDetails = () => {
         backgroundColor: "rgba(255, 255, 255, 0.7)",
       },
     });
-  }, [vendor, colors.text.primary, navigation]);
+  }, [vendor, navigation, toggleFavorite, colors.text.primary]);
 
   if (isLoading && !vendor) {
     return (
@@ -70,6 +79,14 @@ const VendorDetails = () => {
           <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />
         }
       >
+        {/* In a real app, It'd be much nicer to deal with these errors in a more elegant way (e.g. in toast messages)*/}
+        {favoriteError && (
+          <View className="bg-error/10 mx-4 mt-2 mb-2 p-3 rounded-lg border border-error/20">
+            <Text className="text-error text-sm text-center">
+              {favoriteError}
+            </Text>
+          </View>
+        )}
         <View className="relative">
           <Image
             source={{ uri: vendor.thumbnail }}

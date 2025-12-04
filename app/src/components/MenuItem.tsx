@@ -30,8 +30,8 @@ const MenuItem = ({ item }: MenuItemProps) => {
           />
         )}
       </View>
-      <Text className="text-text-primary font-semibold text-base ml-4">
-        ${item.price.toFixed(2)}
+      <Text className="text-text-primary font-semibold text-base ml-4 w-14 text-right">
+        ${item?.price?.toFixed(2)}
       </Text>
     </View>
   );
