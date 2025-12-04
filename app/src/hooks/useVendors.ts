@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { getVendors } from "../api/vendors";
-import { Vendor, VendorsResponse } from "../interfaces/vendor";
+import { Vendor } from "../interfaces/vendor";
 
 const PAGE_SIZE = 20;
 
@@ -8,6 +8,8 @@ const useVendors = () => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
   const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
 
@@ -60,6 +62,20 @@ const useVendors = () => {
     }
   }, [isLoading, isLoadingMore, hasMore, page]);
 
+  const refreshVendors = useCallback(async () => {
+    try {
+      setIsRefreshing(true);
+
+      setVendors([]);
+      //The screen will flicker for a second, in production it would not be necessarry.
+      //I left it here to demonstrate explicit list resetting.
+
+      await loadVendors();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [loadVendors]);
+
   useEffect(() => {
     loadVendors();
   }, [loadVendors]);
@@ -70,9 +86,11 @@ const useVendors = () => {
     error,
     reload: loadVendors,
     isLoadingMore,
+    isRefreshing,
     hasMore,
     loadMore: loadMoreVendors,
     loadMoreError,
+    refresh: refreshVendors,
   };
 };
 

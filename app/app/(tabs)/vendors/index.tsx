@@ -1,15 +1,23 @@
 import VendorCard from "@/src/components/VendorCard";
 import useVendors from "@/src/hooks/useVendors";
 import { router } from "expo-router";
-import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function VendorsScreen() {
   const {
     vendors,
     isLoading,
     error,
-    reload,
+    isRefreshing,
     loadMore,
+    reload,
+    refresh,
     isLoadingMore,
     loadMoreError,
   } = useVendors();
@@ -28,6 +36,9 @@ export default function VendorsScreen() {
       <View className="flex-1 items-center justify-center p-4">
         <Text className="text-error mb-2">{error}</Text>
         {/* for later: add a retry button to call reload() */}
+        <TouchableOpacity onPress={() => reload()}>
+          <Text>Try again</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -38,6 +49,8 @@ export default function VendorsScreen() {
       keyExtractor={(item) => item.id}
       contentContainerStyle={{ paddingHorizontal: 8, paddingVertical: 4 }}
       renderItem={({ item }) => <VendorCard vendor={item} />}
+      refreshing={isRefreshing}
+      onRefresh={refresh}
       onEndReached={loadMore}
       onEndReachedThreshold={0.5}
       ListHeaderComponent={
