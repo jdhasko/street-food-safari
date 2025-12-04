@@ -9,6 +9,7 @@ export const themeColors = {
   border: "#E0E0E0",
   accent: "#FF9800",
   accentDark: "#F57C00",
+  star: "#F5AB00",
   error: "#D32F2F",
   success: "#388E3C",
 };

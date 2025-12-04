@@ -1,0 +1,21 @@
+import type { Vendor, VendorsResponse } from "../interfaces/vendor";
+
+// In a real project, I would place it in an environment variable.
+// For this assignment, I kept it inline for simplicity.
+const API_BASE_URL = "http://192.168.1.141:3333";
+
+export async function getVendors(
+  page: number = 1,
+  limit: number = 20
+): Promise<Vendor[]> {
+  const url = `${API_BASE_URL}/vendors?page=${page}&limit=${limit}`;
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch vendors: ${res.status}`);
+  }
+
+  const jsonData: VendorsResponse = await res.json();
+
+  return jsonData.data;
+}
