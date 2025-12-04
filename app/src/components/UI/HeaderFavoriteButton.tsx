@@ -17,7 +17,6 @@ const HeaderFavoriteButton = ({
     onPress?.();
   };
 
-  // Use red color when favorited, otherwise use the provided iconColor
   const heartColor = isFavorite ? "#D32F2F" : iconColor;
 
   return (
