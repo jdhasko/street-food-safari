@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getVendorById } from "../api/vendors";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { Vendor } from "../interfaces/vendor";
@@ -20,15 +20,14 @@ const useVendorDetails = (id: string) => {
       setError(null);
 
       const data = await getVendorById(id);
-
-      setVendor({ ...data, isFavorite: isFavorite(data.id) });
+      setVendor(data);
     } catch (err) {
       setError("Could not load vendor.");
       console.error("Failed to load vendor", err);
     } finally {
       setIsLoading(false);
     }
-  }, [id, isFavorite]);
+  }, [id]);
 
   const refresh = useCallback(async () => {
     try {
@@ -36,26 +35,31 @@ const useVendorDetails = (id: string) => {
       setError(null);
 
       const data = await getVendorById(id);
-      setVendor({ ...data, isFavorite: isFavorite(data.id) });
+      setVendor(data);
     } catch (err) {
       setError("Could not load vendor.");
       console.error("Failed to refresh vendor", err);
     } finally {
       setIsRefreshing(false);
     }
-  }, [id, isFavorite]);
+  }, [id]);
 
   const toggleFavorite = useCallback(async () => {
     await contextToggleFavorite(id);
-    await refresh();
-  }, [contextToggleFavorite, id, refresh]);
+  }, [contextToggleFavorite, id]);
+
+  // Sync vendor with context's favorite state
+  const vendorWithFavorite = useMemo(() => {
+    if (!vendor) return null;
+    return { ...vendor, isFavorite: isFavorite(vendor.id) };
+  }, [vendor, isFavorite]);
 
   useEffect(() => {
     loadVendor();
   }, [loadVendor]);
 
   return {
-    vendor,
+    vendor: vendorWithFavorite,
     isLoading,
     isRefreshing,
     error,

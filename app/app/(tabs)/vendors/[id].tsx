@@ -1,6 +1,7 @@
 import MapPreviewer from "@/src/components/MapPreviewer";
 import MenuItem from "@/src/components/MenuItem";
 import HeaderFavoriteButton from "@/src/components/UI/HeaderFavoriteButton";
+import { useFavorites } from "@/src/contexts/FavoritesContext";
 import { useThemeColors } from "@/src/hooks/useThemeColors";
 import useVendorDetails from "@/src/hooks/useVendorDetails";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -22,6 +23,7 @@ const VendorDetails = () => {
   const { id } = useLocalSearchParams();
   const colors = useThemeColors();
   const navigation = useNavigation();
+  const { isFavorite } = useFavorites();
   const {
     vendor,
     isLoading,
@@ -33,13 +35,15 @@ const VendorDetails = () => {
     toggleFavorite,
   } = useVendorDetails(id as string);
 
+  const vendorIsFavorite = vendor ? isFavorite(vendor.id) : false;
+
   useLayoutEffect(() => {
     if (!vendor) return;
 
     navigation.setOptions({
       headerRight: () => (
         <HeaderFavoriteButton
-          isFavorite={vendor.isFavorite}
+          isFavorite={vendorIsFavorite}
           iconColor={colors.text.primary}
           onPress={toggleFavorite}
         />
@@ -50,7 +54,13 @@ const VendorDetails = () => {
         backgroundColor: "rgba(255, 255, 255, 0.7)",
       },
     });
-  }, [vendor, navigation, toggleFavorite, colors.text.primary]);
+  }, [
+    vendor,
+    vendorIsFavorite,
+    navigation,
+    toggleFavorite,
+    colors.text.primary,
+  ]);
 
   if (isLoading && !vendor) {
     return (

@@ -30,45 +30,44 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
     [favoriteIds]
   );
 
-  const toggleFavorite = useCallback(
-    async (id: string) => {
-      const wasFavorite = favoriteIds.has(id);
+  const toggleFavorite = useCallback(async (id: string) => {
+    let wasFavorite: boolean = false;
+    setFavoriteIds((prev) => {
+      wasFavorite = prev.has(id);
+      const newState = new Set(prev);
+      if (wasFavorite) {
+        newState.delete(id);
+      } else {
+        newState.add(id);
+      }
+      return newState;
+    });
 
-      // Optimistic update
+    setIsToggling(true);
+    setError(null);
+
+    try {
+      await toggleVendorFavorite(id);
+      // Success - optimistic update
+    } catch {
+      // Rollback on error - restore previous state
+      const shouldBeFavorite = wasFavorite;
+
       setFavoriteIds((prev) => {
-        const newState = new Set(prev);
-        if (wasFavorite) {
-          newState.delete(id);
+        const next = new Set(prev);
+        if (shouldBeFavorite) {
+          next.add(id);
         } else {
-          newState.add(id);
+          next.delete(id);
         }
-        return newState;
+        return next;
       });
 
-      setIsToggling(true);
-      setError(null);
-
-      try {
-        await toggleVendorFavorite(id);
-        // Success - optimistic update
-      } catch (err) {
-        // Rollback on error
-        setFavoriteIds((prev) => {
-          const next = new Set(prev);
-          if (wasFavorite) {
-            next.add(id);
-          } else {
-            next.delete(id);
-          }
-          return next;
-        });
-        setError("Could not update favorite. Please try again.");
-      } finally {
-        setIsToggling(false);
-      }
-    },
-    [favoriteIds]
-  );
+      setError("Could not update favorite. Please try again.");
+    } finally {
+      setIsToggling(false);
+    }
+  }, []);
 
   const setFavoriteIdsFromVendors = useCallback((vendors: Vendor[]) => {
     const ids = new Set(vendors.filter((v) => v.isFavorite).map((v) => v.id));
