@@ -48,3 +48,15 @@ export async function toggleVendorFavorite(id: string): Promise<Vendor> {
   const data: Vendor = await res.json();
   return data;
 }
+
+export async function searchVendors(query: string, limit?: number) {
+  const url = `${API_BASE_URL}/search?query=${query}&limit=${limit}`;
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error(`Failed to search vendors: ${res.status}`);
+  }
+
+  const data: Vendor[] = await res.json();
+  return data;
+}
