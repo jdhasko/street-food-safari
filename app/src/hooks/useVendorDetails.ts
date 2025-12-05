@@ -1,15 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { getVendorById } from "../api/vendors";
+import { useFavorites } from "../contexts/FavoritesContext";
 import { Vendor } from "../interfaces/vendor";
-import useToggleFavorite from "./useToggleFavorite";
 
 const useVendorDetails = (id: string) => {
+  const {
+    toggleFavorite: contextToggleFavorite,
+    isFavorite,
+    error: favoriteError,
+  } = useFavorites();
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
-  const { toggle, favoriteError } = useToggleFavorite();
 
   const loadVendor = useCallback(async () => {
     try {
@@ -17,14 +20,15 @@ const useVendorDetails = (id: string) => {
       setError(null);
 
       const data = await getVendorById(id);
-      setVendor(data);
+
+      setVendor({ ...data, isFavorite: isFavorite(data.id) });
     } catch (err) {
       setError("Could not load vendor.");
       console.error("Failed to load vendor", err);
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, isFavorite]);
 
   const refresh = useCallback(async () => {
     try {
@@ -32,36 +36,19 @@ const useVendorDetails = (id: string) => {
       setError(null);
 
       const data = await getVendorById(id);
-      setVendor(data);
+      setVendor({ ...data, isFavorite: isFavorite(data.id) });
     } catch (err) {
       setError("Could not load vendor.");
       console.error("Failed to refresh vendor", err);
     } finally {
       setIsRefreshing(false);
     }
-  }, [id]);
+  }, [id, isFavorite]);
 
   const toggleFavorite = useCallback(async () => {
-    if (!vendor) return;
-
-    // Capture original vendor before optimistic update
-    const originalVendor = vendor;
-    const previousState = vendor.isFavorite;
-
-    // Optimistic update: immediately update UI
-    setVendor({ ...vendor, isFavorite: !previousState });
-
-    // Call mutation hook
-    const updatedVendor = await toggle(vendor.id);
-
-    if (updatedVendor) {
-      // Success: merge server response with existing vendor to preserve all properties
-      setVendor({ ...originalVendor, ...updatedVendor });
-    } else {
-      // Error: rollback to original state
-      setVendor(originalVendor);
-    }
-  }, [vendor, toggle]);
+    await contextToggleFavorite(id);
+    await refresh();
+  }, [contextToggleFavorite, id, refresh]);
 
   useEffect(() => {
     loadVendor();

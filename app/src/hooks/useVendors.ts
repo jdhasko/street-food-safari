@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { getVendors } from "../api/vendors";
+import { useFavorites } from "../contexts/FavoritesContext";
 import { Vendor } from "../interfaces/vendor";
 
 const PAGE_SIZE = 20;
 
 const useVendors = () => {
+  const { setFavoriteIds } = useFavorites();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -29,6 +31,9 @@ const useVendors = () => {
       const response = await getVendors(1, PAGE_SIZE);
       setVendors(response.data);
 
+      // Sync favorites with Context
+      setFavoriteIds(response.data);
+
       setPage(response.page);
       setTotalPages(response.totalPages);
     } catch (err) {
@@ -37,7 +42,7 @@ const useVendors = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []); //in case PAGE_SIZE becomes dynamic in the future, we will have to pass it as a dependency.
+  }, [setFavoriteIds]); //in case PAGE_SIZE becomes dynamic in the future, we will have to pass it as a dependency.
 
   const loadMoreVendors = useCallback(async () => {
     if (isLoading || isLoadingMore || !hasMore) {
@@ -51,7 +56,14 @@ const useVendors = () => {
       const nextPage = page + 1;
       const response = await getVendors(nextPage, PAGE_SIZE);
 
-      setVendors((prev) => [...prev, ...response.data]);
+      setVendors((prev) => {
+        const updatedVendors = [...prev, ...response.data];
+
+        // Sync all fav. vendors (including new ones) with Context
+        setFavoriteIds(updatedVendors);
+        return updatedVendors;
+      });
+
       setPage(response.page);
       setTotalPages(response.totalPages);
     } catch (err) {
@@ -60,7 +72,7 @@ const useVendors = () => {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [isLoading, isLoadingMore, hasMore, page]);
+  }, [isLoading, isLoadingMore, hasMore, page, setFavoriteIds]);
 
   const refreshVendors = useCallback(async () => {
     try {
