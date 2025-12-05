@@ -46,4 +46,4 @@ const VendorCard = ({ vendor }: VendorCardProps) => {
   );
 };
 
-export default VendorCard;
+export default React.memo(VendorCard);

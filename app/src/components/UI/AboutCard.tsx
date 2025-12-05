@@ -8,7 +8,7 @@ interface AboutCardProps {
 
 export default function AboutCard({ data }: AboutCardProps) {
   return (
-    <View className="bg-card p-6 rounded-lg border border-border w-full mb-6">
+    <View className="bg-white p-6 rounded-lg border border-border w-full mb-6">
       <View className="items-center mb-4">
         <View
           className={`w-16 h-16 rounded-full items-center justify-center mb-4 ${
