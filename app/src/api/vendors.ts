@@ -6,9 +6,25 @@ import { API_BASE_URL } from "../constants/url";
 
 export async function getVendors(
   page: number = 1,
-  limit: number = 20
+  limit: number = 20,
+  city?: string,
+  cuisine?: string
 ): Promise<VendorsResponse> {
-  const url = `${API_BASE_URL}/vendors?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`;
+  const params = new URLSearchParams();
+  params.append("page", page.toString());
+  params.append("limit", limit.toString());
+
+  // Add city filter if provided
+  if (city) {
+    params.append("city", city);
+  }
+
+  // Add cuisine filter if provided
+  if (cuisine) {
+    params.append("cuisine", cuisine);
+  }
+
+  const url = `${API_BASE_URL}/vendors?${params.toString()}`;
   const res = await fetch(url);
 
   if (!res.ok) {

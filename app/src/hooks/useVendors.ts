@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getVendors } from "../api/vendors";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { Vendor } from "../interfaces/vendor";
+import { extractFilterOptions } from "../utils/vendorUtils";
 
 const PAGE_SIZE = 20;
 
@@ -20,6 +21,15 @@ const useVendors = () => {
   const hasMore = totalPages === null ? true : page < totalPages;
   const isLoadingMoreRef = useRef(false);
 
+  // Filter state (single selection)
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
+
+  // Extract unique filter options from vendors
+  const filterOptions = useMemo(() => {
+    return extractFilterOptions(vendors);
+  }, [vendors]);
+
   const loadVendors = useCallback(async () => {
     try {
       //reset states on initial load
@@ -29,7 +39,12 @@ const useVendors = () => {
       setPage(1);
       setTotalPages(null);
 
-      const response = await getVendors(1, PAGE_SIZE);
+      const response = await getVendors(
+        1,
+        PAGE_SIZE,
+        selectedCity || undefined,
+        selectedCuisine || undefined
+      );
       setVendors(response.data);
 
       // Sync favorites with Context
@@ -43,7 +58,7 @@ const useVendors = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [setFavoriteIds]); //in case PAGE_SIZE becomes dynamic in the future, we will have to pass it as a dependency.
+  }, [setFavoriteIds, selectedCity, selectedCuisine]);
 
   const loadMoreVendors = useCallback(async () => {
     if (isLoading || isLoadingMore || !hasMore || isLoadingMoreRef.current) {
@@ -58,7 +73,12 @@ const useVendors = () => {
       setIsLoadingMore(true);
 
       const nextPage = page + 1;
-      const response = await getVendors(nextPage, PAGE_SIZE);
+      const response = await getVendors(
+        nextPage,
+        PAGE_SIZE,
+        selectedCity || undefined,
+        selectedCuisine || undefined
+      );
 
       if (!response.data || !Array.isArray(response.data)) {
         throw new Error("Invalid response: data is missing or not an array");
@@ -82,7 +102,15 @@ const useVendors = () => {
       setIsLoadingMore(false);
       isLoadingMoreRef.current = false;
     }
-  }, [isLoading, isLoadingMore, hasMore, page, setFavoriteIds]);
+  }, [
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    page,
+    setFavoriteIds,
+    selectedCity,
+    selectedCuisine,
+  ]);
 
   const refreshVendors = useCallback(async () => {
     try {
@@ -97,6 +125,22 @@ const useVendors = () => {
       setIsRefreshing(false);
     }
   }, [loadVendors]);
+
+  // Set city filter
+  const setCityFilter = useCallback((city: string | null) => {
+    setSelectedCity(city);
+  }, []);
+
+  // Set cuisine filter
+  const setCuisineFilter = useCallback((cuisine: string | null) => {
+    setSelectedCuisine(cuisine);
+  }, []);
+
+  // Clear all filters
+  const clearFilters = useCallback(() => {
+    setSelectedCity(null);
+    setSelectedCuisine(null);
+  }, []);
 
   useEffect(() => {
     loadVendors();
@@ -113,6 +157,13 @@ const useVendors = () => {
     loadMore: loadMoreVendors,
     loadMoreError,
     refresh: refreshVendors,
+    // Filter-related returns
+    selectedCity,
+    selectedCuisine,
+    setCityFilter,
+    setCuisineFilter,
+    clearFilters,
+    filterOptions,
   };
 };
 

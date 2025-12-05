@@ -19,7 +19,7 @@ export default function AboutScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white" edges={["top", "left", "right"]}>
       <ScrollView
-        className="flex-1"
+        className="flex-1 bg-card"
         contentContainerStyle={{
           flexGrow: 1,
           alignItems: "center",

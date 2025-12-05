@@ -23,6 +23,11 @@ export default function VendorsScreen() {
     refresh,
     isLoadingMore,
     loadMoreError,
+    selectedCity,
+    selectedCuisine,
+    setCityFilter,
+    setCuisineFilter,
+    filterOptions,
   } = useVendors();
 
   const {
@@ -37,6 +42,14 @@ export default function VendorsScreen() {
 
   const dataToShow = isSearchMode ? results : vendors;
   const listError = isSearchMode ? searchError : error;
+
+  const handleCityFilterChange = (city: string | null) => {
+    setCityFilter(city);
+  };
+
+  const handleCuisineFilterChange = (cuisine: string | null) => {
+    setCuisineFilter(cuisine);
+  };
 
   if (isLoading && vendors.length === 0) {
     return (
@@ -67,6 +80,11 @@ export default function VendorsScreen() {
           isSearchMode={isSearchMode}
           searchTotal={searchTotal}
           error={listError}
+          selectedCity={selectedCity}
+          selectedCuisine={selectedCuisine}
+          filterOptions={filterOptions}
+          onCityFilterChange={handleCityFilterChange}
+          onCuisineFilterChange={handleCuisineFilterChange}
         />
         <FlatList
           data={dataToShow}
