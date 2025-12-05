@@ -2,7 +2,7 @@ import type { Vendor, VendorsResponse } from "../interfaces/vendor";
 
 // In a real project, I would place it in an environment variable.
 // For this assignment, I kept it inline for simplicity.
-const API_BASE_URL = "http://192.168.1.141:3333";
+import { API_BASE_URL } from "../constants/url";
 
 export async function getVendors(
   page: number = 1,
