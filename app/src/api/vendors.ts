@@ -8,7 +8,7 @@ export async function getVendors(
   page: number = 1,
   limit: number = 20
 ): Promise<VendorsResponse> {
-  const url = `${API_BASE_URL}/vendors?page=${page}&limit=${limit}`;
+  const url = `${API_BASE_URL}/vendors?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`;
   const res = await fetch(url);
 
   if (!res.ok) {
@@ -21,7 +21,7 @@ export async function getVendors(
 }
 
 export async function getVendorById(id: string) {
-  const url = `${API_BASE_URL}/vendors/${id}`;
+  const url = `${API_BASE_URL}/vendors/${encodeURIComponent(id)}`;
   const res = await fetch(url);
 
   if (!res.ok) {
@@ -33,7 +33,7 @@ export async function getVendorById(id: string) {
 }
 
 export async function toggleVendorFavorite(id: string): Promise<Vendor> {
-  const url = `${API_BASE_URL}/vendors/${id}/favorite`;
+  const url = `${API_BASE_URL}/vendors/${encodeURIComponent(id)}/favorite`;
   const res = await fetch(url, {
     method: "POST",
     headers: {
@@ -49,14 +49,17 @@ export async function toggleVendorFavorite(id: string): Promise<Vendor> {
   return data;
 }
 
-export async function searchVendors(query: string, limit?: number) {
-  const url = `${API_BASE_URL}/search?query=${query}&limit=${limit}`;
-  const res = await fetch(url);
+export async function searchVendors(
+  query: string,
+  signal?: AbortSignal
+): Promise<VendorsResponse> {
+  const url = `${API_BASE_URL}/search?q=${encodeURIComponent(query)}`;
+  const res = await fetch(url, { signal });
 
   if (!res.ok) {
     throw new Error(`Failed to search vendors: ${res.status}`);
   }
 
-  const data: Vendor[] = await res.json();
+  const data: VendorsResponse = await res.json();
   return data;
 }

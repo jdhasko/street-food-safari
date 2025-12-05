@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getVendors } from "../api/vendors";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { Vendor } from "../interfaces/vendor";
@@ -18,6 +18,7 @@ const useVendors = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number | null>(null);
   const hasMore = totalPages === null ? true : page < totalPages;
+  const isLoadingMoreRef = useRef(false);
 
   const loadVendors = useCallback(async () => {
     try {
@@ -45,24 +46,32 @@ const useVendors = () => {
   }, [setFavoriteIds]); //in case PAGE_SIZE becomes dynamic in the future, we will have to pass it as a dependency.
 
   const loadMoreVendors = useCallback(async () => {
-    if (isLoading || isLoadingMore || !hasMore) {
+    if (isLoading || isLoadingMore || !hasMore || isLoadingMoreRef.current) {
       return;
     }
 
     try {
+      //As states updates are asynchronous, I used a ref to track the loading state in the guard condition.
+      //Got an issue with quick updates when the user scrolls fast.
+      isLoadingMoreRef.current = true;
       setLoadMoreError(null);
       setIsLoadingMore(true);
 
       const nextPage = page + 1;
       const response = await getVendors(nextPage, PAGE_SIZE);
 
+      if (!response.data || !Array.isArray(response.data)) {
+        throw new Error("Invalid response: data is missing or not an array");
+      }
+      let updatedVendors: Vendor[] = [];
       setVendors((prev) => {
-        const updatedVendors = [...prev, ...response.data];
-
-        // Sync all fav. vendors (including new ones) with Context
-        setFavoriteIds(updatedVendors);
+        updatedVendors = [...prev, ...response.data];
         return updatedVendors;
       });
+
+      // Sync all fav. vendors (including new ones) with Context
+      // Note: setVendors callback executes synchronously, so updatedVendors is set here
+      setFavoriteIds(updatedVendors);
 
       setPage(response.page);
       setTotalPages(response.totalPages);
@@ -71,6 +80,7 @@ const useVendors = () => {
       setLoadMoreError("Could not load more vendors.");
     } finally {
       setIsLoadingMore(false);
+      isLoadingMoreRef.current = false;
     }
   }, [isLoading, isLoadingMore, hasMore, page, setFavoriteIds]);
 

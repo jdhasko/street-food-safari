@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "streetfoodsafari",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light", //I'm forcing light mode because for this exercise I'll not support dark mode.
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true

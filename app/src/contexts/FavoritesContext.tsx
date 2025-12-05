@@ -70,6 +70,9 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const setFavoriteIdsFromVendors = useCallback((vendors: Vendor[]) => {
+    if (!vendors || !Array.isArray(vendors)) {
+      return;
+    }
     const ids = new Set(vendors.filter((v) => v.isFavorite).map((v) => v.id));
     setFavoriteIds(ids);
   }, []);
